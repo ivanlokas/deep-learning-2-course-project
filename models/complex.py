@@ -1,12 +1,15 @@
 import torch.nn as nn
 
 
-class PrototypeDiscriminator(nn.Module):
-    def __init__(self):
+class ComplexDiscriminator(nn.Module):
+    def __init__(self, image_size, n_channels):
         super().__init__()
 
+        self.image_size = image_size
+        self.n_channels = n_channels
+
         self.layers = nn.Sequential(
-            nn.Linear(self.n_input, 1024),
+            nn.Linear(self.image_size ** 2, 1024),
             nn.LeakyReLU(0.2),
             nn.Dropout(0.3),
 
@@ -18,7 +21,7 @@ class PrototypeDiscriminator(nn.Module):
             nn.LeakyReLU(0.2),
             nn.Dropout(0.3),
 
-            nn.Linear(256, 1),
+            nn.Linear(256, self.n_channels),
             nn.Sigmoid()
         )
 
@@ -26,10 +29,11 @@ class PrototypeDiscriminator(nn.Module):
         return self.layers(x)
 
 
-class PrototypeGenerator(nn.Module):
-    def __init__(self, noise_dimension):
+class ComplexGenerator(nn.Module):
+    def __init__(self, image_size, noise_dimension):
         super().__init__()
 
+        self.image_size = image_size
         self.noise_dimension = noise_dimension
 
         self.layers = nn.Sequential(
@@ -42,7 +46,7 @@ class PrototypeGenerator(nn.Module):
             nn.Linear(512, 1024),
             nn.LeakyReLU(0.2),
 
-            nn.Linear(1024, 784),
+            nn.Linear(1024, self.image_size ** 2),
             nn.Tanh()
         )
 
