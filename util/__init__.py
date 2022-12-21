@@ -13,6 +13,8 @@ def train(
         generator_optimizer,
         batch_size,
         n_epochs,
+        n_channels,
+        image_size,
         noise_dimension,
 ) -> None:
     """
@@ -28,16 +30,18 @@ def train(
         generator_optimizer: Generator optimizer
         batch_size: Batch size
         n_epochs: Number of epochs
+        n_channels: Number of channels
+        image_size: Image size
         noise_dimension: Noise dimension
     """
 
     writer = SummaryWriter()
-    fixed_noise = torch.randn((batch_size, noise_dimension)).to(device)
+    fixed_noise = torch.randn((batch_size * n_channels, noise_dimension)).to(device)
 
     for epoch in range(n_epochs):
         for index, (features, labels) in enumerate(train_dataloader):
-            features_real = features.view(-1, 784).to(device)
-            noise = torch.randn(batch_size, noise_dimension).to(device)
+            features_real = features.view(-1, image_size ** 2).to(device)
+            noise = torch.randn(batch_size * n_channels, noise_dimension).to(device)
 
             # Train dataset
             features_real = features_real.float()
@@ -72,8 +76,8 @@ def train(
 
             if index == 0:
                 with torch.no_grad():
-                    features_real = features_real.view(-1, 1, 28, 28)
-                    features_generated = generator(fixed_noise).view(-1, 1, 28, 28)
+                    features_real = features_real.view(batch_size, n_channels, image_size, image_size)
+                    features_generated = generator(fixed_noise).view(batch_size, n_channels, image_size, image_size)
 
                     grid_real = torchvision.utils.make_grid(features_real, normalize=True)
                     grid_generated = torchvision.utils.make_grid(features_generated, normalize=True)

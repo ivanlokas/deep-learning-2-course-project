@@ -7,7 +7,7 @@ Deep learning 2 course project which focuses on acquiring knowledge the field of
 ## Project Organization
 
     ├── datasets                <- Folder that contains all raw datasets
-    │   ├──                     <- TODO
+    │   ├── cars                <- Dataset from "3D Object Representations for Fine-Grained Categorization"
     ├── docs                    <- Project documentation
     ├── models                  <- Models used in this project
     ├── performance             <- Folder that contains summary of model performance
