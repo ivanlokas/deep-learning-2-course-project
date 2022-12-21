@@ -12,12 +12,12 @@ if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # Hyper parameters
-    batch_size = 64
+    batch_size = 256
     learning_rate = 1e-5
     betas = (0.5, 0.999)
     n_epochs = 50
     noise_dimension = 128
-    image_size = 32
+    image_size = 256
     n_channels = 3
 
     # Dataset folder name
@@ -59,6 +59,9 @@ if __name__ == "__main__":
         betas=betas
     )
 
+    save_state = True
+    save_state_dir = f'complex_bs_{batch_size}_ne_{n_epochs}_lr_{learning_rate}'
+
     # Train model
     train(
         discriminator=discriminator,
@@ -72,5 +75,7 @@ if __name__ == "__main__":
         n_epochs=n_epochs,
         n_channels=n_channels,
         image_size=image_size,
-        noise_dimension=noise_dimension
+        noise_dimension=noise_dimension,
+        save_state=save_state,
+        save_state_dir=save_state_dir
     )

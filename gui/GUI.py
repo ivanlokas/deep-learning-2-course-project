@@ -2,9 +2,12 @@ from pathlib import Path
 
 import tkinter as tk
 from tkinter import ttk
-from tkinter import filedialog as fd
 
+import torch
 from PIL import Image, ImageTk
+from torchvision import transforms
+
+from models.complex import ComplexGenerator
 
 
 class GeneratorApp(tk.Tk):
@@ -40,6 +43,25 @@ class GeneratorApp(tk.Tk):
 
 
 class MainFrame(ttk.Frame):
+    # Image transform
+    transform = transforms.ToPILImage()
+
+    # Hyper parameters
+    batch_size = 64
+    learning_rate = 1e-5
+    betas = (0.5, 0.999)
+    n_epochs = 50
+    noise_dimension = 128
+    image_size = 32
+    n_channels = 3
+
+    # Model
+    generator = ComplexGenerator(image_size=image_size, noise_dimension=noise_dimension)
+
+    # Load state dict
+    path = Path(__file__).parent.parent / 'states' / f'complex_bs_{batch_size}_ne_{n_epochs}_lr_{learning_rate}' \
+           / f'generator_epoch_{0}'
+    generator.load_state_dict(torch.load(path))
 
     def __init__(self, container):
         super().__init__(container)
@@ -98,19 +120,11 @@ class MainFrame(ttk.Frame):
             self, self.action_generate)
         button_frame.pack(fill=tk.BOTH, side=tk.TOP)
 
-    # TODO: Delete this variable when model is functional
-    index = 0
-
     def action_generate(self, event=None):
-        # TODO: integrate model into the GUI
-        model_output = ...  # generate model output
-        image = ...  # convert model output to Image
-
-        # TODO: Delete this block when model is functional
-        self.index = self.index % 3 + 1
-        image = Image.open(Path(__file__).parent /
-                           ('images/example' + str(self.index) + '.jpg'))
-        self.index += 1
+        noise = torch.randn(MainFrame.n_channels, MainFrame.noise_dimension)
+        model_output = MainFrame.generator(noise).float()
+        model_output = torch.reshape(model_output, (MainFrame.n_channels, MainFrame.image_size, MainFrame.image_size))
+        image = MainFrame.transform(model_output)
 
         self.image_canvas.set_image(image)
         self.image_canvas.update()
