@@ -1,3 +1,6 @@
+import os
+from pathlib import Path
+
 import torch
 import torchvision
 from torch.utils.tensorboard import SummaryWriter
@@ -16,6 +19,8 @@ def train(
         n_channels,
         image_size,
         noise_dimension,
+        save_state=False,
+        save_state_dir=None
 ) -> None:
     """
     Generic GAN training function
@@ -33,7 +38,12 @@ def train(
         n_channels: Number of channels
         image_size: Image size
         noise_dimension: Noise dimension
+        save_state: True if model should be saved, False otherwise
+        save_state_dir: Directory where model will be saved
     """
+
+    discriminator_start_state_dict = discriminator.state_dict()
+    generator_start_state_dict = generator.state_dict()
 
     writer = SummaryWriter()
     fixed_noise = torch.randn((batch_size * n_channels, noise_dimension)).to(device)
@@ -84,3 +94,24 @@ def train(
 
                     writer.add_image("Real", grid_real, epoch)
                     writer.add_image("Generated", grid_generated, epoch)
+
+                    # Save model state
+                    if save_state:
+
+                        # Specify save state directory
+                        path = Path(__file__).parent.parent / 'states' / save_state_dir
+
+                        # Create save state directory, if it does not exist
+                        if not os.path.exists(path):
+                            os.makedirs(path)
+
+                        # Save starting state
+                        if epoch == 0:
+                            torch.save(discriminator_start_state_dict, path / f'discriminator_epoch_{epoch}')
+                            torch.save(generator_start_state_dict, path / f'generator_epoch_{epoch}')
+
+                        # Save state at end of epoch
+                        torch.save(discriminator.state_dict(), path / f'discriminator_epoch_{epoch + 1}')
+                        torch.save(generator.state_dict(), path / f'generator_epoch_{epoch + 1}')
+
+    writer.close()
