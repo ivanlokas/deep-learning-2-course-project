@@ -9,10 +9,11 @@ class PrototypeDiscriminator(nn.Module):
         self.n_channels = n_channels
 
         self.layers = nn.Sequential(
-            nn.Linear(self.image_size ** 2, 128),
+            nn.Flatten(),
+            nn.Linear(self.n_channels * self.image_size ** 2, 128),
             nn.LeakyReLU(0.01),
-            nn.Linear(128, self.n_channels),
-            nn.Sigmoid()
+            nn.Linear(128, 1),
+            nn.Sigmoid(),
         )
 
     def forward(self, x):
@@ -29,8 +30,9 @@ class PrototypeGenerator(nn.Module):
         self.layers = nn.Sequential(
             nn.Linear(noise_dimension, 256),
             nn.LeakyReLU(0.01),
-            nn.Linear(256, self.image_size ** 2),
-            nn.Tanh()
+            nn.Linear(256, self.n_channels * self.image_size ** 2),
+            nn.Tanh(),
+            nn.Unflatten(1, (self.n_channels, self.image_size, self.image_size)),
         )
 
     def forward(self, x):

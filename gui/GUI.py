@@ -1,13 +1,12 @@
-from pathlib import Path
-
 import tkinter as tk
+from pathlib import Path
 from tkinter import ttk
 
 import torch
 from PIL import Image, ImageTk
 from torchvision import transforms
 
-from models.complex import ComplexGenerator
+from models.convolutional import ConvolutionalGenerator
 
 
 class GeneratorApp(tk.Tk):
@@ -44,23 +43,29 @@ class GeneratorApp(tk.Tk):
 
 class MainFrame(ttk.Frame):
     # Image transform
-    transform = transforms.ToPILImage()
+    mean, std = (-0.5 / 0.5, -0.5 / 0.5, -0.5 / 0.5), (1 / 0.5, 1 / 0.5, 1 / 0.5)
+    transform = transforms.Compose([
+        transforms.Normalize(mean, std),
+        transforms.ToPILImage(),
+    ])
 
     # Hyper parameters
-    batch_size = 64
-    learning_rate = 1e-5
+    batch_size = 80
+    learning_rate = 1e-3
     betas = (0.5, 0.999)
-    n_epochs = 50
+    n_epochs = 100
     noise_dimension = 128
-    image_size = 32
+    image_size = 256
     n_channels = 3
+    epoch = 16
 
     # Model
-    generator = ComplexGenerator(image_size=image_size, noise_dimension=noise_dimension)
+    generator = ConvolutionalGenerator(image_size=image_size, noise_dimension=noise_dimension)
 
     # Load state dict
-    path = Path(__file__).parent.parent / 'states' / f'complex_bs_{batch_size}_ne_{n_epochs}_lr_{learning_rate}' \
-           / f'generator_epoch_{0}'
+    path = Path(__file__).parent.parent / 'states' \
+           / f'convolutional_bs_{batch_size}_ne_{n_epochs}_lr_{learning_rate}_sz_{image_size}' \
+           / f'generator_epoch_{epoch}'
     generator.load_state_dict(torch.load(path))
 
     def __init__(self, container):
@@ -121,7 +126,7 @@ class MainFrame(ttk.Frame):
         button_frame.pack(fill=tk.BOTH, side=tk.TOP)
 
     def action_generate(self, event=None):
-        noise = torch.randn(MainFrame.n_channels, MainFrame.noise_dimension)
+        noise = torch.randn(1, MainFrame.noise_dimension, 1, 1)
         model_output = MainFrame.generator(noise).float()
         model_output = torch.reshape(model_output, (MainFrame.n_channels, MainFrame.image_size, MainFrame.image_size))
         image = MainFrame.transform(model_output)

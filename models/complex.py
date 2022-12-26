@@ -9,7 +9,8 @@ class ComplexDiscriminator(nn.Module):
         self.n_channels = n_channels
 
         self.layers = nn.Sequential(
-            nn.Linear(self.image_size ** 2, 1024),
+            nn.Flatten(),
+            nn.Linear(self.n_channels * self.image_size ** 2, 1024),
             nn.LeakyReLU(0.2),
             nn.Dropout(0.3),
 
@@ -21,8 +22,8 @@ class ComplexDiscriminator(nn.Module):
             nn.LeakyReLU(0.2),
             nn.Dropout(0.3),
 
-            nn.Linear(256, self.n_channels),
-            nn.Sigmoid()
+            nn.Linear(256, 1),
+            nn.Sigmoid(),
         )
 
     def forward(self, x):
@@ -46,8 +47,10 @@ class ComplexGenerator(nn.Module):
             nn.Linear(512, 1024),
             nn.LeakyReLU(0.2),
 
-            nn.Linear(1024, self.image_size ** 2),
-            nn.Tanh()
+            nn.Linear(1024, self.n_channels * self.image_size ** 2),
+            nn.Tanh(),
+
+            nn.Unflatten(1, (self.n_channels, self.image_size, self.image_size)),
         )
 
     def forward(self, x):

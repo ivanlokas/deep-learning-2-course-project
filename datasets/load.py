@@ -24,10 +24,14 @@ def get_loaders(dataset_name: str, batch_size: int = 32, transform=transforms.To
 
     data = ImageFolder(DATA_DIR, transform=transform)
 
-    train_data, validation_data, test_data = random_split(data, [0.5, 0.25, 0.25])
+    c = len(data) // 4
+    b = len(data) // 2 - c
+    a = len(data) - b - c
 
-    train_dataloader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
-    validation_dataloader = DataLoader(validation_data, batch_size=batch_size, shuffle=True)
-    test_dataloader = DataLoader(test_data, batch_size=batch_size, shuffle=True)
+    train_data, validation_data, test_data = random_split(data, [a, b, c])
+
+    train_dataloader = DataLoader(train_data, batch_size=batch_size, drop_last=True, pin_memory=True, shuffle=True)
+    validation_dataloader = DataLoader(validation_data, batch_size=batch_size, drop_last=True, pin_memory=True, shuffle=False)
+    test_dataloader = DataLoader(test_data, batch_size=batch_size, drop_last=True, pin_memory=True, shuffle=False)
 
     return train_dataloader, validation_dataloader, test_dataloader
