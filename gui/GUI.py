@@ -50,14 +50,14 @@ class MainFrame(ttk.Frame):
     ])
 
     # Hyper parameters
-    batch_size = 80
-    learning_rate = 1e-3
+    batch_size = 64
+    learning_rate = 5e-4
     betas = (0.5, 0.999)
     n_epochs = 100
     noise_dimension = 128
     image_size = 256
     n_channels = 3
-    epoch = 16
+    epoch = 100
 
     # Model
     generator = ConvolutionalGenerator(image_size=image_size, noise_dimension=noise_dimension)

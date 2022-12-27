@@ -28,10 +28,14 @@ def get_loaders(dataset_name: str, batch_size: int = 32, transform=transforms.To
     b = len(data) // 2 - c
     a = len(data) - b - c
 
+    # a = len(data) // 8
+    # b = len(data) // 16
+    # c = len(data) - a - b
+
     train_data, validation_data, test_data = random_split(data, [a, b, c])
 
-    train_dataloader = DataLoader(train_data, batch_size=batch_size, drop_last=True, pin_memory=True, shuffle=True)
-    validation_dataloader = DataLoader(validation_data, batch_size=batch_size, drop_last=True, pin_memory=True, shuffle=False)
-    test_dataloader = DataLoader(test_data, batch_size=batch_size, drop_last=True, pin_memory=True, shuffle=False)
+    train_dataloader = DataLoader(train_data, batch_size=batch_size, drop_last=True, pin_memory=False, shuffle=True)
+    validation_dataloader = DataLoader(validation_data, batch_size=batch_size, drop_last=True, pin_memory=False, shuffle=False)
+    test_dataloader = DataLoader(test_data, batch_size=batch_size, drop_last=True, pin_memory=False, shuffle=False)
 
     return train_dataloader, validation_dataloader, test_dataloader

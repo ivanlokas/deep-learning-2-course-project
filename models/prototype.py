@@ -28,11 +28,12 @@ class PrototypeGenerator(nn.Module):
         self.noise_dimension = noise_dimension
 
         self.layers = nn.Sequential(
+            nn.Flatten(),
             nn.Linear(noise_dimension, 256),
-            nn.LeakyReLU(0.01),
-            nn.Linear(256, self.n_channels * self.image_size ** 2),
+            nn.LeakyReLU(0.01, inplace=True),
+            nn.Linear(256, 3 * self.image_size ** 2),
             nn.Tanh(),
-            nn.Unflatten(1, (self.n_channels, self.image_size, self.image_size)),
+            nn.Unflatten(1, (3, self.image_size, self.image_size)),
         )
 
     def forward(self, x):

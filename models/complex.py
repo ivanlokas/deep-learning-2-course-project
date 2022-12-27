@@ -38,19 +38,20 @@ class ComplexGenerator(nn.Module):
         self.noise_dimension = noise_dimension
 
         self.layers = nn.Sequential(
+            nn.Flatten(),
             nn.Linear(noise_dimension, 256),
-            nn.LeakyReLU(0.2),
+            nn.LeakyReLU(0.02, inplace=True),
 
             nn.Linear(256, 512),
-            nn.LeakyReLU(0.2),
+            nn.LeakyReLU(0.02, inplace=True),
 
             nn.Linear(512, 1024),
-            nn.LeakyReLU(0.2),
+            nn.LeakyReLU(0.02, inplace=True),
 
-            nn.Linear(1024, self.n_channels * self.image_size ** 2),
+            nn.Linear(1024, 3 * self.image_size ** 2),
             nn.Tanh(),
 
-            nn.Unflatten(1, (self.n_channels, self.image_size, self.image_size)),
+            nn.Unflatten(1, (3, self.image_size, self.image_size)),
         )
 
     def forward(self, x):

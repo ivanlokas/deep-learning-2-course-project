@@ -3,6 +3,7 @@ from torch import nn
 from torchvision import transforms
 
 from datasets.load import get_loaders
+from models.complex import ComplexDiscriminator, ComplexGenerator
 from models.convolutional import ConvolutionalDiscriminator, ConvolutionalGenerator
 from util import train
 
@@ -11,8 +12,8 @@ if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # Hyper parameters
-    batch_size = 80
-    learning_rate = 1e-3
+    batch_size = 64
+    learning_rate = 5e-4
     betas = (0.5, 0.999)
     n_epochs = 100
     noise_dimension = 128
@@ -39,11 +40,11 @@ if __name__ == "__main__":
 
     # Models
 
-    # discriminator = PrototypeDiscriminator(image_size, n_channels).to(device)
-    # generator = PrototypeGenerator(image_size, noise_dimension).to(device)
-
     discriminator = ConvolutionalDiscriminator(image_size, n_channels).to(device)
     generator = ConvolutionalGenerator(image_size, noise_dimension).to(device)
+
+    # discriminator = ConvolutionalDiscriminator(image_size, n_channels).to(device)
+    # generator = ConvolutionalGenerator(image_size, noise_dimension).to(device)
 
     # Model arguments
     criterion = nn.BCELoss()
@@ -61,7 +62,7 @@ if __name__ == "__main__":
     )
 
     save_state = True
-    save_state_dir = f'convolutional_bs_{batch_size}_ne_{n_epochs}_lr_{learning_rate}_sz_{image_size}'
+    save_state_dir = f'convolutional_small_bs_{batch_size}_ne_{n_epochs}_lr_{learning_rate}_sz_{image_size}'
 
     # Train model
     train(
@@ -79,5 +80,6 @@ if __name__ == "__main__":
         image_size=image_size,
         noise_dimension=noise_dimension,
         save_state=save_state,
-        save_state_dir=save_state_dir
+        save_state_dir=save_state_dir,
+        start_epoch=17,
     )

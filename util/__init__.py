@@ -69,6 +69,7 @@ def train(
         noise_dimension,
         save_state=False,
         save_state_dir=None,
+        start_epoch=None,
 ) -> None:
     """
     Generic GAN training function
@@ -99,19 +100,24 @@ def train(
     # Specify save state directory
     path = Path(__file__).parent.parent / 'states' / save_state_dir
 
-    # Save model state
-    if save_state:
-        # Create save state directory, if it does not exist
-        if not os.path.exists(path):
-            os.makedirs(path)
+    if start_epoch is not None:
+        generator.load_state_dict(torch.load(path / f'generator_epoch_{start_epoch}'))
+        discriminator.load_state_dict(torch.load(path / f'discriminator_epoch_{start_epoch}'))
+    else:
+        # Save model state
+        if save_state:
+            # Create save state directory, if it does not exist
+            if not os.path.exists(path):
+                os.makedirs(path)
 
-        # Save starting state
-        torch.save(discriminator_start_state_dict, path / f'discriminator_epoch_{0}')
-        torch.save(generator_start_state_dict, path / f'generator_epoch_{0}')
+            # Save starting state
+            torch.save(discriminator_start_state_dict, path / f'discriminator_epoch_{0}')
+            torch.save(generator_start_state_dict, path / f'generator_epoch_{0}')
+        start_epoch = 0
 
     print(len(train_dataloader), len(validation_dataloader))
 
-    for epoch in range(n_epochs):
+    for epoch in range(start_epoch, n_epochs):
         generator.train()
         discriminator.train()
         for index, (features, labels) in enumerate(train_dataloader):
@@ -174,6 +180,6 @@ def train(
         loss_discriminator_mean = sum(losses_discriminator) / len(losses_discriminator)
         loss_generator_mean = sum(losses_generator) / len(losses_generator)
 
-        print(f"Epoch {epoch}: discriminator {loss_discriminator_mean}, generator {loss_generator_mean}")
+        print(f"Epoch {epoch + 1}: discriminator {loss_discriminator_mean}, generator {loss_generator_mean}")
 
     writer.close()
