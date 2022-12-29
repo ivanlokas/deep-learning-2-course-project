@@ -16,25 +16,24 @@ if __name__ == "__main__":
 
     # Hyper parameters
     batch_size = 64
-    learning_rate = 1e-3
+    learning_rate = 5e-4
     betas = (0.5, 0.999)
     n_epochs = 100
     noise_dimension = 128
     image_size = 256
     n_channels = 3
-    epoch = 44
+    epoch = 50
 
     # Model
     generator = ConvolutionalGenerator(image_size=image_size, noise_dimension=noise_dimension)
 
     # Load state dict
     path = Path(__file__).parent / 'states' \
-           / f'convolutional_small_bs_{batch_size}_ne_{n_epochs}_lr_{learning_rate}_sz_{image_size}' \
+           / f'convolutional2_bs_{batch_size}_ne_{n_epochs}_lr_{learning_rate}_sz_{image_size}' \
            / f'generator_epoch_{epoch}'
     generator.load_state_dict(torch.load(path))
 
     # Generate image
-    # torch.manual_seed(1)
     noise = torch.randn(64, noise_dimension, 1, 1)
     model_output = generator(noise).float().detach()
     model_output = torch.reshape(model_output, (-1, 3, image_size, image_size))

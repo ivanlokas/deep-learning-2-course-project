@@ -43,9 +43,6 @@ if __name__ == "__main__":
     discriminator = ConvolutionalDiscriminator(image_size, n_channels).to(device)
     generator = ConvolutionalGenerator(image_size, noise_dimension).to(device)
 
-    # discriminator = ConvolutionalDiscriminator(image_size, n_channels).to(device)
-    # generator = ConvolutionalGenerator(image_size, noise_dimension).to(device)
-
     # Model arguments
     criterion = nn.BCELoss()
 
@@ -62,7 +59,7 @@ if __name__ == "__main__":
     )
 
     save_state = True
-    save_state_dir = f'convolutional_small_bs_{batch_size}_ne_{n_epochs}_lr_{learning_rate}_sz_{image_size}'
+    save_state_dir = f'convolutional2_bs_{batch_size}_ne_{n_epochs}_lr_{learning_rate}_sz_{image_size}'
 
     # Train model
     train(
@@ -81,5 +78,4 @@ if __name__ == "__main__":
         noise_dimension=noise_dimension,
         save_state=save_state,
         save_state_dir=save_state_dir,
-        start_epoch=17,
     )
